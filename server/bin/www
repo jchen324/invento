@@ -4,7 +4,9 @@
  * Module dependencies.
  */
 
-const {app} = require('../app');
+// const {app} = require('../app');
+const {createApp} = require('../app');
+const app = createApp(process.env.MONGO_STRING);
 const debug = require('debug')('server:server');
 const http = require('http');
 
