@@ -1,7 +1,7 @@
 beforeEach(() => {
     // Reset the database before each test
     const path = require('path');
-    const scriptPath = path.join(__dirname, '../../../server/populatedb.js');
+    const scriptPath = path.join(__dirname, '../../../../server/populatedb.js');
     cy.exec(`node ${scriptPath}`);
 
     // cy.exec('node ../../../server/populatedb.js');
