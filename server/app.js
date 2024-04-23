@@ -29,8 +29,8 @@ function createApp(dbUri) {
 }
 
 // Default app instance for regular server startup
-const app = createApp(process.env.MONGO_STRING);
+// const app = createApp(process.env.MONGO_STRING);
 
 module.exports = createApp; // Export the factory function for testing or other purposes
-module.exports.app = app; // Export the default app instance for regular usage
+// module.exports.app = app; // Export the default app instance for regular usage
 

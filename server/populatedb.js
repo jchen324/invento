@@ -24,6 +24,8 @@ async function main() {
   await mongoose.connect(process.env.MONGO_STRING);
   console.log("Debug: Should be connected?");
   // ! Categories must be created first before item depend on category
+  await clearDatabase(); 
+  console.log('Database cleared.');
   await createCategories();
   await createItems();
   console.log("Debug: Closing mongoose");
