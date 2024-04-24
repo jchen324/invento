@@ -65,81 +65,42 @@ describe("Items Page Tests", () => {
     cy.contains("All items");
   });
 
-// Adding a test case for overflow with a large price
-it('should not overflow when a large price is entered', () => {
-  // Assume the test starts with intercepting the POST request and visiting the create page as in the provided script
+  it("The stock will be automatically round down to 100", () => {
+    // Assume the test starts with intercepting the POST request and visiting the create page as in the provided script
 
-  // Enter the test data with a large price
-  cy.intercept("POST", "**/item/create", { statusCode: 200 }).as(
-    "createItem"
-  );
-  cy.visit("/edit/item?title=Create+new+item");
-  cy.contains("label", "Name").next().children("input").type("Test");
-  cy.contains("label", "Description")
-    .next()
-    .children("input")
-    .type("This is a test description.");
+    // Enter the test data with a large price
+    cy.intercept("POST", "**/item/create", { statusCode: 200 }).as(
+      "createItem"
+    );
+    cy.visit("/edit/item?title=Create+new+item");
+    cy.contains("label", "Name").next().children("input").type("Test");
+    cy.contains("label", "Description")
+      .next()
+      .children("input")
+      .type("This is a test description.");
 
-  // Enter a large price that might cause overflow
-  const largePrice = '99999999999999999999';
-  cy.contains("label", "Price").next().children("input").type(largePrice);
+    // Enter a large price that might cause overflow
+    const largePrice = "99999999999999999999";
+    cy.contains("label", "Price").next().children("input").type("10");
 
-  // Continue filling out the rest of the form
-  cy.contains("label", "Stock").next().children("input").type("5");
-  cy.contains("label", "Category")
-    .next()
-    .children("select")
-    .select("Electronics");
-  cy.contains("label", "Status")
-    .next()
-    .children("select")
-    .select("Available");
+    // Continue filling out the rest of the form
+    cy.contains("label", "Stock").next().children("input").type("200");
+    cy.contains("label", "Category")
+      .next()
+      .children("select")
+      .select("Electronics");
+    cy.contains("label", "Status")
+      .next()
+      .children("select")
+      .select("Available");
 
-  cy.contains("button", "Submit").click();
-  // cy.visit("http://localhost:3000/items");
-  // cy.contains("Test").click();
-  // cy.contains(largePrice)
-  cy.wait("@createItem").then((interception) => {
-    expect(interception.request.body).to.have.property('price', largePrice);
+    cy.contains("button", "Submit").click();
+    cy.wait("@createItem").then((interception) => {
+      cy.visit("http://localhost:3000/items");
+      cy.contains("Test").click();
+      // it should display the correct stock
+      cy.contains("200");
+      expect(interception.request.body).to.have.property("stock", 200);
+    });
   });
-});
-
-it('The stock will be automatically round down to 100', () => {
-  // Assume the test starts with intercepting the POST request and visiting the create page as in the provided script
-
-  // Enter the test data with a large price
-  cy.intercept("POST", "**/item/create", { statusCode: 200 }).as(
-    "createItem"
-  );
-  cy.visit("/edit/item?title=Create+new+item");
-  cy.contains("label", "Name").next().children("input").type("Test");
-  cy.contains("label", "Description")
-    .next()
-    .children("input")
-    .type("This is a test description.");
-
-  // Enter a large price that might cause overflow
-  const largePrice = '99999999999999999999';
-  cy.contains("label", "Price").next().children("input").type("10");
-
-  // Continue filling out the rest of the form
-  cy.contains("label", "Stock").next().children("input").type("200");
-  cy.contains("label", "Category")
-    .next()
-    .children("select")
-    .select("Electronics");
-  cy.contains("label", "Status")
-    .next()
-    .children("select")
-    .select("Available");
-
-  cy.contains("button", "Submit").click();
-  cy.wait("@createItem").then((interception) => {
-    cy.visit("http://localhost:3000/items");
-    cy.contains("Test").click();
-    // it should display the correct stock 
-    cy.contains("200"); 
-    expect(interception.request.body).to.have.property('stock', 200);
-  });
-});
 });
