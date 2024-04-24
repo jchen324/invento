@@ -89,6 +89,7 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
 
   // check if password invalid
   if (password !== process.env.ADMIN_KEY) {
+		console.log("here");
     res.writeHead(403, `Permission denied`);
     return res.send();
   }
@@ -98,6 +99,9 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
     Category.findById(req.params.id).exec(),
     Item.find({ category: req.params.id }).exec(),
   ]);
+
+	console.log(category);
+	console.log(items);
 
   // check if category exists
   if (!category) {

@@ -19,7 +19,7 @@ describe('Home Page Update After Edit', () => {
       cy.contains("label", "Price").next().children("input").clear().type("10");
       cy.contains("button", "Submit").click();
   
-  
+
       // Navigate back to the Home page
       cy.visit('http://localhost:3000');
   
@@ -29,7 +29,9 @@ describe('Home Page Update After Edit', () => {
       // Verify the Home page reflects the updated data
       // For example, check that the count for a category has increased/decreased
       // or that the 'Latest items' list includes the newly edited item
-      // ...
+      cy.get('p.mantine-Text-root').contains('Yoga Ball').should('exist');
+
+      
     });
 
     it('updates the charts and lists on the Home page after an item is deleted', () => {
@@ -50,21 +52,25 @@ describe('Home Page Update After Edit', () => {
       
 
         cy.contains("Smartphone").click();
-        cy.contains("button", "Delete").click();
-        cy.on('window:confirm', () => true);
+        // cy.get('button.mantine-UnstyledButton-root').click();
+        cy.window().then((win) => {
+          cy.stub(win, 'prompt').returns('1234');
+        });
+        cy.get('[data-testid="delete-button"]').click();
 
-    
         // Navigate back to the Home page   
         cy.visit('http://localhost:3000');
     
         // Wait for the API calls to complete to ensure the page has fresh data
         cy.wait(['@getItemsByCategory', '@getRecentItems']);
-        cy.on('window:confirm', () => true);
+        
+
     
         // Verify the Home page reflects the updated data
         // For example, check that the count for a category has decreased
         // or that the 'Latest items' list no longer includes the deleted item
         // ...
+        cy.get('p.mantine-Text-root').contains('Smartphone').should('not.exist');
       });
   });
   

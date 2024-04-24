@@ -184,7 +184,7 @@ export default function ItemPage({ backendURL, displayError }: appProps) {
           </Grid.Col>
         </Grid>
       </SimpleGrid>
-      <ActionIcon onClick={deleteItem} variant="subtle" color="gray">
+      <ActionIcon onClick={deleteItem} variant="subtle" color="gray" data-testid="delete-button">
         <IconTrash
           style={{ width: rem(20), height: rem(20) }}
           color={theme.colors.red[6]}

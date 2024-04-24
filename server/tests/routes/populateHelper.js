@@ -4,7 +4,6 @@ const Item = require("../../models/item");
 async function clearDatabase() {
     await Category.deleteMany({});
     await Item.deleteMany({});
-    console.log("Database cleared.");
 }
 
 async function createCategories() {
@@ -18,7 +17,6 @@ async function createCategories() {
 
     // Save categories to database and return them
     const categories = await Category.insertMany(categoriesData);
-    console.log("Categories added.");
     return categories;
 }
 
@@ -39,7 +37,6 @@ async function createItems(categories) {
 
     // Save items to database
     await Item.insertMany(itemsData);
-    console.log("Items added.");
 }
 
 module.exports = {

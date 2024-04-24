@@ -13,7 +13,7 @@ const request = supertest(createApp("mongodb+srv://taimingshi:taimingshi@cluster
 	});
 
 	afterEach(async () => {
-			await clearDatabase();
+			await clearDatabase(); 
 	});
 
 		it("should retrieve all categories", async () => {
@@ -30,7 +30,7 @@ const request = supertest(createApp("mongodb+srv://taimingshi:taimingshi@cluster
 				name: cat.name,
 				description: cat.description
 			}))).toEqual(expect.arrayContaining(expectedCategories));
-			console.log(response.body);
+			// console.log(response.body);
 		});
 
 		
@@ -48,7 +48,7 @@ const request = supertest(createApp("mongodb+srv://taimingshi:taimingshi@cluster
 			const response = await request.get("/categories/total");
 			expect(response.status).toBe(200);
 			expect(response.body).toBe(4);
-		});
+		}); 
 
 		it("create a new category", async () => {
 			const newCategory = {
@@ -59,6 +59,31 @@ const request = supertest(createApp("mongodb+srv://taimingshi:taimingshi@cluster
 			expect(response.status).toBe(200); 
 			expect(response.text).toBe("success");
 		});
+
+
+		it("update a category" , async() => {
+			const allCategories = await request.get("/categories");
+			const category = allCategories.body[0];
+			const id = category._id;
+			const updatedCategory = {
+				name: "Updated Category",
+				description: "This is an updated category"
+			};
+			const response = await request.post("/category/" + id + "/update").send(updatedCategory);
+			expect(response.status).toBe(200);
+			expect(response.text).toBe("success");
+		})
+		
+		it("delete a category", async () => {
+			const allCategories = await request.get("/categories");
+			const category = allCategories.body[0];
+			const id = category._id;
+			const response = await request.post("/category/" + id + "/delete");
+			expect(response.status).toBe(403);
+			expect(response.body).toBe("Permission denied");
+		});
+
+		
 	});
 
 	// describe("Item Routes", () => {

@@ -113,11 +113,17 @@ describe('Categories Page Tests', () => {
         
             // Find the Delete button for the category and click it
             cy.contains('tr', 'Books').within(() => {
+              cy.window().then((win) => {
+                cy.stub(win, 'prompt').returns('1234');
+              });
               cy.get('button').contains('Delete').click();
             });
-      
-            cy.on('window:confirm', () => true);
-      
+
+            cy.wait('@deleteCategory');
+
+            cy.get('@deleteCategory').then((interception) => {
+              expect(interception.response.statusCode).to.eq(200);
+            });
           });
     
 });

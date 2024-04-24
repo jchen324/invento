@@ -2,24 +2,24 @@ import React from "react";
 import { wrapWithProviders } from "../../support/wrapWithProviders";
 import HorizontalBarChart from "../../../components/charts/HorizontalBarChart";
 import { Item } from "../../../common/types";
+import { Chart as ChartJS } from 'chart.js';
 
-describe("HorizontalBarChart Component", () => {
-  const defaultProps = {
-    themeIndex: 1,
-    labelsArray: ["Home Decor", "Electronics", "Gym"],
-    dataArray: [10, 21, 23],
-    dataLabel: "Dataset",
-    titleName: "Number of items per category",
-  };
 
-  it("renders correctly with default props", () => {
-    cy.mount(<HorizontalBarChart {...defaultProps} />);
-    cy.get("canvas").should("be.visible");  // Chart.js renders a <canvas> element
+describe('HorizontalBarChart Component', () => {
 
-    // Additional checks can include verifying the chart has the right number of bars,
-    // checking for correct labels and titles, or even checking the style of the bars if necessary.
-    cy.get(".chartjs-render-monitor").should("exist");  // Specific class used by Chart.js
+  it('renders correctly with default props', () => {
+    cy.mount(wrapWithProviders(<HorizontalBarChart />));
+    cy.get('canvas').should('be.visible'); 
+    cy.get('canvas[role="img"]').should('be.visible');
+    // cy.get("a").contains('Number of items per category').should('be.visible');
   });
 
-  // More tests can be added here to cover different themes, prop combinations, etc.
+  it('updates dataset when props change', () => {
+    const newLabels = ['Books', 'Movies', 'Music'];
+    const newData = [15, 9, 20];
+
+    cy.mount(wrapWithProviders(<HorizontalBarChart labelsArray={['Books', 'Movies', 'Music']} dataArray={[15, 9, 20]} />));
+    cy.get('canvas').should('be.visible');
+  });
 });
+
