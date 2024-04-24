@@ -21,12 +21,10 @@ exports.category_list = asyncHandler(async (req, res, next) => {
 // Display one Category
 exports.category_detail = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.params.id).exec();
-
   if (category === null) {
     // No results.
     res.redirect("/categories");
   }
-
   res.json(category);
 });
 
@@ -89,7 +87,6 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
 
   // check if password invalid
   if (password !== process.env.ADMIN_KEY) {
-		console.log("here");
     res.writeHead(403, `Permission denied`);
     return res.send();
   }
@@ -99,9 +96,6 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
     Category.findById(req.params.id).exec(),
     Item.find({ category: req.params.id }).exec(),
   ]);
-
-	console.log(category);
-	console.log(items);
 
   // check if category exists
   if (!category) {
