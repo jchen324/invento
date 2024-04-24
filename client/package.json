@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "npx cypress run",
+    "test": "npx cypress run --component && npx cypress run",
     "cypress:open": "npx cypress open"
   },
   "dependencies": {
