@@ -7,7 +7,7 @@ describe('Home Page Update After Edit', () => {
       cy.intercept('GET', '/items/recent/*').as('getRecentItems');
   
       // Perform the edit operation (navigating and editing an item)
-      cy.visit('http://localhost:3000/items');
+      cy.visit('/items');
       cy.intercept("POST", "**/item/**/update", { statusCode: 200 }).as(
         "updateItem"
       );

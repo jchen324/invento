@@ -134,12 +134,12 @@ it('The stock will be automatically round down to 100', () => {
     .select("Available");
 
   cy.contains("button", "Submit").click();
-  // cy.visit("http://localhost:3000/items");
-  // cy.contains("Test").click();
-  // cy.contains(largePrice)
   cy.wait("@createItem").then((interception) => {
+    cy.visit("http://localhost:3000/items");
+    cy.contains("Test").click();
+    // it should display the correct stock 
+    cy.contains("200"); 
     expect(interception.request.body).to.have.property('stock', 200);
   });
 });
-
 });
