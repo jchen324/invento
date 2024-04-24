@@ -3,6 +3,7 @@
 	import createApp from "../../app.js"; 
 	import { createCategories, createItems, clearDatabase } from "./populateHelper.js";
 	const Category = require("../../models/category");
+	const Item = require("../../models/item");
 
 
 
@@ -327,7 +328,7 @@ const expectedItems = [
 			// get all items and check if the new item is added
 		});
 
-		it("create a new item with invalid data", async () => {
+		it("create a new item with invalid name", async () => {
 			const categories = await request.get("/categories");
 			const category = categories.body[0];
 			const newCategory = category._id;
@@ -344,7 +345,7 @@ const expectedItems = [
 			expect(response.status).toBe(400); // get 500 instead
 			// expect(response.body).toContain("Name must have at least 3 characters.");
 		});
-
+ 
 		it("create a new item with invalid category", async () => {
 			const newItem = {
 				name: "Test Item",
@@ -356,7 +357,95 @@ const expectedItems = [
 			};
 			const response = await request.post("/item/create").send(newItem);
 			// expect(response.status).toBe(400);
+			console.log(response.text);
 		});
 
+		it("create a new item with image", async () => {
+			const categories = await request.get("/categories");
+			const category = categories.body[0];
+			const newCategory = category._id;
+			const newItem = {
+				name: "Test Item",
+				description: "This is a test item",
+				status: "Available",
+				stock: 100,
+				price: 100,
+				category: newCategory,
+				image: {
+					url: "https://example.com/image.jpg",
+					alt: "Image description"
+				}
+			};
+			const response = await request.post("/item/create").send(newItem);
+			expect(response.status).toBe(200);
+			expect(response.text).toBe("success");
+		});
+
+		it("delete an item", async () => {
+			const allItems = await request.get("/items");
+			const item = allItems.body[0];
+			const id = item._id;
+			const response = await request.post("/item/" + id + "/delete").send({ password: "1234" });
+			expect(response.status).toBe(200);
+			expect(response.text).toBe("success");
+		});
+
+		it("delete an item without password", async () => {
+			const allItems = await request.get("/items");
+			const item = allItems.body[0];
+			const id = item._id;
+			const response = await request.post("/item/" + id + "/delete");
+			expect(response.status).toBe(403);
+			// expect(response.text).toBe("Permission denied");
+		});
+
+		// FAULT
+		it("delete an item with invalid id", async () => {
+			const response = await request.post("/item/123/delete").send({ password: "1234" });
+			expect(response.status).toBe(500);
+		}); 
+
+		it("delete an item with non-existing id", async () => {
+			const response = await request.post("/item/5f9b1b1b4f3b9b1b4f3b9b1b/delete").send({ password: "1234" });
+			// expect(response.status).toBe(404);
+		});
+
+		it("delete an item that has been already deleted", async () => {
+			const allItems = await request.get("/items");
+			const item = allItems.body[0];
+			const id = item._id;
+			await Item.findByIdAndRemove(id);
+			const deleteAgainResponse = await request.post("/item/" + id + "/delete").send({ password: "1234" });
+			// expect(deleteAgainResponse.status).toBe(404);
+		});
+
+		it("update an item", async () => {
+			const allItems = await request.get("/items");
+			const item = allItems.body[0];
+			const id = item._id;
+			const updatedItem = {
+				_id: id,
+				name: "Updated Item",
+				description: "This is an updated item",
+				status: "Available",
+				stock: 100,
+				price: 100,
+				category: item.category
+			};
+			const response = await request.post("/item/" + id + "/update").send(updatedItem);
+			expect(response.status).toBe(200);
+			expect(response.text).toBe("success");
+		});
+
+		// FAULT
+		it("update an item with null object", async () => {
+			const allItems = await request.get("/items");
+			const item = allItems.body[0];
+			const id = item._id;
+			const updatedItem = null;
+			const response = await request.post("/item/" + id + "/update").send(updatedItem);
+			expect(response.status).toBe(500);
+			// expect(response.body).toContain("Name must have at least 3 characters.");
+		});
 
 	});
