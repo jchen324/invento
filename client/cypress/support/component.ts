@@ -37,3 +37,6 @@ Cypress.Commands.add('mount', mount)
 
 // Example use:
 // cy.mount(<MyComponent />)
+
+import compareSnapshotCommand from 'cypress-image-diff-js/command';
+compareSnapshotCommand();

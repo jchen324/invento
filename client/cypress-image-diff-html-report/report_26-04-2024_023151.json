@@ -1,0 +1,31 @@
+{
+  "total": 1,
+  "totalPassed": 1,
+  "totalFailed": 0,
+  "totalSuites": 1,
+  "suites": [
+    {
+      "name": "HorizontalBarChart.cy.tsx",
+      "path": "cypress/components/charts/HorizontalBarChart.cy.tsx",
+      "tests": [
+        {
+          "status": "pass",
+          "name": "HorizontalBarChart.cy.tsx-bar-chart",
+          "percentage": 0.038405728739343045,
+          "failureThreshold": 0.2,
+          "specPath": "cypress/components/charts/HorizontalBarChart.cy.tsx",
+          "specFilename": "HorizontalBarChart.cy.tsx",
+          "baselinePath": "cypress-image-diff-screenshots/baseline/HorizontalBarChart.cy.tsx-bar-chart.png",
+          "diffPath": "",
+          "comparisonPath": "cypress-image-diff-screenshots/comparison/HorizontalBarChart.cy.tsx-bar-chart.png"
+        }
+      ]
+    }
+  ],
+  "startedAt": "2024-04-26T06:31:51.817Z",
+  "endedAt": "2024-04-26T06:32:04.164Z",
+  "duration": 1843,
+  "browserName": "electron",
+  "browserVersion": "118.0.5993.159",
+  "cypressVersion": "13.8.0"
+}

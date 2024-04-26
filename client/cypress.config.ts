@@ -1,4 +1,6 @@
 import { defineConfig } from "cypress";
+import getCompareSnapshotsPlugin from 'cypress-image-diff-js/plugin';
+
 
 export default defineConfig({
   e2e: {
@@ -12,6 +14,9 @@ export default defineConfig({
     devServer: {
       framework: "next",
       bundler: "webpack",
+    },
+    setupNodeEvents(on, config) {
+      return getCompareSnapshotsPlugin(on, config);
     },
   },
 });
