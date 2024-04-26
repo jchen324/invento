@@ -36,9 +36,14 @@ npm install
 
 In the `server` folder create a `.env` file  with the following contents:
 ```bash
-# Replace with mongo connection string
-MONGO_STRING="mongodb+srv://cooluser:coolpassword@cluster0.lz91hw2.mongodb.net/invento?retryWrites=true&w=majority"
-ADMIN_KEY="1234" # Admin key to delete item/category
+MONGO_STRING="mongodb+srv://terry2017530749:AN7a3TZrQEaLlZqr@invento.xnyzlyn.mongodb.net/invento?retryWrites=true&w=majority"
+ADMIN_KEY="1234"
+```
+
+Also in the same folder, create a `.env.test` file with the following contents:
+```bash
+MONGO_STRING="mongodb+srv://admin:admin@invento.xcddxcm.mongodb.net/?retryWrites=true&w=majority&appName=invento"
+ADMIN_KEY="1234"
 ```
 
 To start local server:
