@@ -46,14 +46,6 @@ MONGO_STRING="mongodb+srv://admin:admin@invento.xcddxcm.mongodb.net/?retryWrites
 ADMIN_KEY="1234"
 ```
 
-To start local server:
-
-```bash
-npm run dev
-```
-
-Backend is deployed at [http://localhost:3001](http://localhost:3001).
-
 ### Frontend
 
 To install dependencies for frontend:
@@ -61,10 +53,3 @@ To install dependencies for frontend:
 cd client
 npm install
 ```
-
-To run the development server locally:
-```bash
-npm run dev
-```
-
-Frontend is deployed at [http://localhost:3000](http://localhost:3000).
