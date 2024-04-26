@@ -65,27 +65,8 @@ describe("Items Page Tests", () => {
     cy.contains("All items");
   });
 
-<<<<<<< HEAD
-it('The stock will be automatically round down to 100', () => {
-  // Assume the test starts with intercepting the POST request and visiting the create page as in the provided script
-
-  // Enter the test data with a large price
-  cy.intercept("POST", "**/item/create", { statusCode: 200 }).as(
-    "createItem"
-  );
-  cy.visit("/edit/item?title=Create+new+item");
-  cy.contains("label", "Name").next().children("input").type("Test");
-  cy.contains("label", "Description")
-    .next()
-    .children("input")
-    .type("This is a test description.");
-
-  cy.contains("label", "Price").next().children("input").type("10");
-=======
   it("The stock will be automatically round down to 100", () => {
-    // Assume the test starts with intercepting the POST request and visiting the create page as in the provided script
-
-    // Enter the test data with a large price
+    // Mock the create item POST request
     cy.intercept("POST", "**/item/create", { statusCode: 200 }).as(
       "createItem"
     );
@@ -96,10 +77,7 @@ it('The stock will be automatically round down to 100', () => {
       .children("input")
       .type("This is a test description.");
 
-    // Enter a large price that might cause overflow
-    const largePrice = "99999999999999999999";
     cy.contains("label", "Price").next().children("input").type("10");
->>>>>>> 625498e050146fe074bdbf4545eb43963bac723a
 
     // Continue filling out the rest of the form
     cy.contains("label", "Stock").next().children("input").type("200");
