@@ -97,18 +97,26 @@ describe("Category Routes", () => {
     expect(response.body).toMatchObject(category);
   });
 
-  // FAULT
+  /*
+	* FAILURE 1: returns status 500 instead of 400 when provided with random invalid id
+	* This is because category_detail() function does not have a try catch block to catch the error thrown by mongoose
+	* when the id is invalid, and the function terminates by throwing 500 server error instead of redirecting to the /categories endpoint.
+	*/
   it("retrieve a single category with invalid id", async () => {
     const response = await request.get("/category/123");
-    // expect(response.status).toBe(400);
+    expect(response.status).toBe(400);
   });
 
-  // FAULT
+  /*
+	* FAILURE 2: does not return null in the body of the response when provided with non-existing mongoose id
+	* This is because the category_detail function does not return after redirecting to the /categories endpoint,
+	* causing the code to fall through and returning an empty object which shouldn't happen.
+	*/
   it("retrieve a single category with non-existing mongoose id", async () => {
     const response = await request.get("/category/5f9b1b1b4f3b9b1b4f3b9b1b");
     console.log(response.body);
     expect(response.status).toBe(302);
-    // expect(response.body).toBe(null);
+    expect(response.body).toBe(null);
   });
 
   it("get total num of categories", async () => {
@@ -125,7 +133,6 @@ describe("Category Routes", () => {
     const response = await request.post("/category/create").send(newCategory);
     expect(response.status).toBe(200);
     expect(response.text).toBe("success");
-    // get all categories and check if the new category is added
     const allCategories = await request.get("/categories");
     expect(
       allCategories.body.map((cat) => ({
@@ -135,26 +142,34 @@ describe("Category Routes", () => {
     ).toContainEqual(newCategory);
   });
 
-  // FAULT
+  /*
+	* FAILURE 3: when creating a new category that does not fulfill the minimum character requirement,
+	* we are unable to access the error response message.
+	* This is because the category_create_post function is incorrectly sending error messages through res.writeHead() 
+	*/
   it("create a new category with invalid data", async () => {
     const newCategory = {
       name: "T",
       description: "This is a test category",
     };
     const response = await request.post("/category/create").send(newCategory);
-    // expect(response.status).toBe(400); // get 500 instead
-    // expect(response.body).toContain("Name must have at least 3 characters.");
+    expect(response.status).toBe(400);
+    expect(response.body).toContain("Name must have at least 3 characters.");
   });
 
-  // FAULT
+  /*
+	* FAILURE 4: when creating a new category with an existing name, we get 500 instead of 403 status code
+	* This is because the category_create_post function forgets to await the Category.find() function.
+	* Later on mongoose throws duplicate key error, which causes 500 server error to be thrown.
+	*/
   it("create a new category with existing name", async () => {
     const newCategory = {
       name: "Electronics",
       description: "This is a test category",
     };
     const response = await request.post("/category/create").send(newCategory);
-    // expect(response.status).toBe(403);
-    // expect(response.body).toContain("Category Electronics already exists.");
+    expect(response.status).toBe(403);
+    expect(response.body).toContain("Category Electronics already exists.");
   });
 
   it("update a category", async () => {
@@ -172,7 +187,11 @@ describe("Category Routes", () => {
     expect(response.text).toBe("success");
   });
 
-  // FAULT
+  /*
+	* FAILURE 5: when updating a category with invalid data, we do not get 400 status code, and 200 success instead
+	* This is because the category_update_post function does not check for the minimum character requirement for name and description
+	* This is inconsistent with the requirements that it has in the category_create_post function
+	*/
   it("update a category with invalid data", async () => {
     const allCategories = await request.get("/categories");
     const category = allCategories.body[0];
@@ -184,11 +203,14 @@ describe("Category Routes", () => {
     const response = await request
       .post("/category/" + id + "/update")
       .send(updatedCategory);
-    // expect(response.status).toBe(400); // get 200 instead， does not check for min 3 char
-    // expect(response.body).toContain("Name must have at least 3 characters.");
+    expect(response.status).toBe(400); // get 200 instead， does not check for min 3 char
+    expect(response.body).toContain("Name must have at least 3 characters.");
   });
 
-  // FAULT
+  /*
+	* FAILURE 6: when updating a category with non-existing id, we do not get 404 status code, and 200 success instead
+	* This is because the category_update_post function does not check if the category exists before attempting to update it
+	*/
   it("update a category with non-existing id", async () => {
     const updatedCategory = {
       name: "Updated Category",
@@ -197,7 +219,7 @@ describe("Category Routes", () => {
     const response = await request
       .post("/category/5f9b1b1b4f3b9b1b4f3b9b1b/update")
       .send(updatedCategory);
-    // expect(response.status).toBe(404); // still returns 200
+    expect(response.status).toBe(404); // still returns 200
   });
 
   it("update a category with invalid id", async () => {
@@ -211,17 +233,23 @@ describe("Category Routes", () => {
     expect(response.status).toBe(500);
   });
 
-  // FAULT
+  /*
+	* FAILURE 7: when deleting a category without password, we are unable to get the correct error message
+	* This is because the category_delete_post function is incorrectly sending error messages through res.writeHead()
+	*/
   it("delete a category without password", async () => {
     const allCategories = await request.get("/categories");
     const category = allCategories.body[0];
     const id = category._id;
     const response = await request.post("/category/" + id + "/delete");
     expect(response.status).toBe(403);
-    // expect(response.body).toBe("Permission denied");
+    expect(response.text).toBe("Permission denied");
   });
 
-  // FAULT
+  /*
+	* FAILURE 8: when deleting a category with correct password that is used by existing item, we do not get the correct error message
+	* This is because the category_delete_post function is incorrectly sending error messages through res.writeHead()
+	*/
   it("delete category with correct password that is used by existing item", async () => {
     const allCategories = await request.get("/categories");
     const category = allCategories.body[0];
@@ -230,7 +258,7 @@ describe("Category Routes", () => {
       .post("/category/" + id + "/delete")
       .send({ password: "1234" });
     expect(response.status).toBe(403);
-    // expect(response.body).toContain("Cannot delete a category that is used by the following items:");
+    expect(response.body).toContain("Cannot delete a category that is used by the following items:");
   });
 
   it("delete category with correct password that is not used by any item", async () => {
@@ -247,12 +275,16 @@ describe("Category Routes", () => {
     expect(deleteResponse.text).toBe("success");
   });
 
-  // FAULT
+  /*
+	* FAILURE 9: when deleting a category with an invalid random id, we do not get 400 status code, and 500 instead
+	* This is because the category_delete_post function does not have a try catch block to catch the error thrown by mongoose
+	* when the id is invalid, and the function terminates by throwing 500 server error.
+	*/
   it("delete category with invalid id", async () => {
     const response = await request
       .post("/category/123/delete")
       .send({ password: "1234" });
-    // expect(response.status).toBe(400); return 500 from mongoose error
+    expect(response.status).toBe(400);
   });
 
   it("delete category with non-existing id", async () => {
@@ -262,6 +294,10 @@ describe("Category Routes", () => {
     expect(response.status).toBe(404);
   });
 });
+
+
+
+
 
 describe("Item Routes", () => {
   beforeEach(async () => {
@@ -402,6 +438,10 @@ describe("Item Routes", () => {
     // get all items and check if the new item is added
   });
 
+	/*
+	* FAILURE 10: when creating a new item with invalid name, we do not get the correct error message
+	* This is because the item_create_post function is incorrectly sending error messages through res.writeHead()
+	*/
   it("create a new item with invalid name", async () => {
     const categories = await request.get("/categories");
     const category = categories.body[0];
@@ -415,11 +455,15 @@ describe("Item Routes", () => {
       category: newCategory,
     };
     const response = await request.post("/item/create").send(newItem);
-    console.log(response.body);
-    expect(response.status).toBe(400); // get 500 instead
-    // expect(response.body).toContain("Name must have at least 3 characters.");
+    expect(response.status).toBe(400);
+    expect(response.body).toContain("Name must have at least 3 characters.");
   });
 
+	/*
+	* FAILURE 11: when creating a new item with invalid category, we get 500 instead of 400 status code
+	* This is because the item_create_post function does not await for the Category.findById() function to complete
+	* and mongoose later on throws an error which is uncaught and causes 500 server error to be thrown.
+	*/
   it("create a new item with invalid category", async () => {
     const newItem = {
       name: "Test Item",
@@ -430,8 +474,7 @@ describe("Item Routes", () => {
       category: "5f9b1b1b4f3b9b1b4f3b9b1b",
     };
     const response = await request.post("/item/create").send(newItem);
-    // expect(response.status).toBe(400);
-    console.log(response.text);
+    expect(response.status).toBe(400);
   });
 
   it("create a new item with image", async () => {
@@ -466,16 +509,23 @@ describe("Item Routes", () => {
     expect(response.text).toBe("success");
   });
 
+	/*
+	* FAILURE 12: when deleting an item without password, we do not get the correct error message
+	* This is because the item_delete_post function is incorrectly sending error messages through res.writeHead()
+	*/
   it("delete an item without password", async () => {
     const allItems = await request.get("/items");
     const item = allItems.body[0];
     const id = item._id;
     const response = await request.post("/item/" + id + "/delete");
     expect(response.status).toBe(403);
-    // expect(response.text).toBe("Permission denied");
+    expect(response.text).toBe("Permission denied");
   });
 
-  // FAULT
+  /*
+	* FAILURE 13: when deleting an item with correct password that is used by existing item, we get an uncaught error
+	* This is because the item_delete_post function does not check for valid IDs before attempting to delete the item
+	*/
   it("delete an item with invalid id", async () => {
     const response = await request
       .post("/item/123/delete")
@@ -483,13 +533,23 @@ describe("Item Routes", () => {
     expect(response.status).toBe(500);
   });
 
+	/*
+	* FAILURE 14: when deleting an item with non-existing id, we do not get 404 status code, and 500 instead
+	* This is because the item_delete_post function does not await for the Item.findById() function to complete beore attempting to delete the item
+	*/
   it("delete an item with non-existing id", async () => {
     const response = await request
       .post("/item/5f9b1b1b4f3b9b1b4f3b9b1b/delete")
       .send({ password: "1234" });
-    // expect(response.status).toBe(404);
+    expect(response.status).toBe(404);
   });
 
+	/*
+	* FAILURE 15: when deleting an item that has been already deleted, we do not get 404 status code, and 200 success instead
+	* This is caused again by the item_delete_post function not checking for valid IDs before attempting to delete the item
+	* The mongoose function Item.findByIdAndRemove() returns null when the item does not exist, and dosn't throw error either
+	* Resulting in us getting a 200 success status code instead of 404
+	*/
   it("delete an item that has been already deleted", async () => {
     const allItems = await request.get("/items");
     const item = allItems.body[0];
@@ -498,7 +558,7 @@ describe("Item Routes", () => {
     const deleteAgainResponse = await request
       .post("/item/" + id + "/delete")
       .send({ password: "1234" });
-    // expect(deleteAgainResponse.status).toBe(404);
+    expect(deleteAgainResponse.status).toBe(404);
   });
 
   it("update an item", async () => {
@@ -521,7 +581,10 @@ describe("Item Routes", () => {
     expect(response.text).toBe("success");
   });
 
-  // FAULT
+  /*
+	* FAILURE 16: when updating an item with null object, we do not get a meaningful error message
+	* This is because the item_update_post function is incorrectly sending error messages through res.writeHead()
+	*/
   it("update an item with null object", async () => {
     const allItems = await request.get("/items");
     const item = allItems.body[0];
@@ -531,6 +594,6 @@ describe("Item Routes", () => {
       .post("/item/" + id + "/update")
       .send(updatedItem);
     expect(response.status).toBe(500);
-    // expect(response.body).toContain("Name must have at least 3 characters.");
+    expect(response.body).toContain("Name must have at least 3 characters.");
   });
 });
