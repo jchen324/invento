@@ -29,8 +29,8 @@ async function createItems(categories) {
 
     // Define items with references to category IDs
     const itemsData = [
-        { name: "Smartphone", description: "A high-end smartphone", category: categoryMap["Electronics"], status: 'Available', stock: 20, price: 999.99 },
-        { name: "Jeans", description: "Comfortable blue jeans", category: categoryMap["Clothing"], status: 'Available', stock: 50, price: 49.99 },
+        { name: "Smartphone", description: "A high-end smartphone", category: categoryMap["Electronics"], status: 'Reserved', stock: 20, price: 999.99 },
+        { name: "Jeans", description: "Comfortable blue jeans", category: categoryMap["Clothing"], status: 'Loaned', stock: 50, price: 49.99 },
         { name: "Milk", description: "A carton of fresh milk", category: categoryMap["Groceries"], status: 'Available', stock: 100, price: 2.99 },
         { name: "Table", description: "A sturdy wooden table", category: categoryMap["Home Decor"], status: 'Available', stock: 10, price: 199.99 },
     ];

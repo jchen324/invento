@@ -3,6 +3,7 @@
 	import createApp from "../../app.js"; 
 	import { createCategories, createItems, clearDatabase } from "./populateHelper.js";
 	const Category = require("../../models/category");
+	const Item = require("../../models/item");
 
 
 
@@ -13,15 +14,23 @@
 	{ name: "Groceries", description: "Food and household items for daily consumption" },
 	{ name: "Home Decor", description: "Items used to decorate and enhance the aesthetic appeal of homes" },
 ];
+
+const expectedItems = [
+	{ name: "Smartphone", description: "A high-end smartphone", category: "Electronics", status: "Reserved", stock: 20 },
+	{ name: "Jeans", description: "Comfortable blue jeans", category: "Clothing", status: "Loaned", stock: 50 },
+	{ name: "Milk", description: "A carton of fresh milk", category: "Groceries", status: "Available", stock: 100 },
+	{ name: "Table", description: "A sturdy wooden table", category: "Home Decor", status: "Available", stock: 10 },
+];
+
 	describe("Category Routes", () => {
 		beforeEach(async () => {
 			const categories = await createCategories();
 			await createItems(categories);
 	});
 
-	afterEach(async () => {
-			await clearDatabase(); 
-	});
+		afterEach(async () => {
+				await clearDatabase(); 
+		});
 
 		it("should retrieve all categories", async () => {
 			
@@ -199,11 +208,244 @@
 		
 	});
 
-	// describe("Item Routes", () => {
-	// 	it("should retrieve all items", async () => {
-	// 		const response = await request.get("/items");
-	// 		expect(response.status).toBe(200);
-	// 		expect(response.body).toBeInstanceOf(Array);
-	// 	});
+	describe("Item Routes", () => {
+		beforeEach(async () => {
+			const categories = await createCategories();
+			await createItems(categories);
+	});
 
-	// });
+		afterEach(async () => {
+				await clearDatabase(); 
+		});
+
+		it("get total num of items", async () => {
+			const response = await request.get("/items/total");
+			expect(response.status).toBe(200);
+			expect(response.body).toBe(4);
+		});
+
+		it("get recent 3 items", async () => {
+			const response = await request.get("/items/recent/3");
+			expect(response.status).toBe(200);
+			expect(response.body).toBeInstanceOf(Array);
+			expect(response.body.length).toBe(3);
+			expect(response.body.map(item => ({
+				name: item.name,
+				description: item.description,
+				status: item.status,
+				stock: item.stock,
+			}))).toEqual(expect.arrayContaining(
+				[
+					{ name: "Jeans", description: "Comfortable blue jeans", status: "Loaned", stock: 50 },
+					{ name: "Milk", description: "A carton of fresh milk", status: "Available", stock: 100 },
+					{ name: "Table", description: "A sturdy wooden table", status: "Available", stock: 10 },
+				]
+			));
+		});
+
+		it("get recent 50 items", async () => {
+			const response = await request.get("/items/recent/50");
+			expect(response.status).toBe(200);
+			expect(response.body).toBeInstanceOf(Array);
+			expect(response.body.length).toBe(4);
+		});
+
+		it("get items grouped by category", async () => {
+			const response = await request.get("/items/grouped-by-category");
+			expect(response.status).toBe(200);
+			expect(response.body).toBeInstanceOf(Object);
+			expect(Object.keys(response.body).length).toBe(4);
+			expect(response.body).toEqual(expect.arrayContaining(
+				[
+					{ totalItems: 1, category: 'Electronics' },
+					{ totalItems: 1, category: 'Home Decor' },
+					{ totalItems: 1, category: 'Clothing' },
+					{ totalItems: 1, category: 'Groceries' }
+				]
+			));
+		});
+
+		it("get items grouped by status", async () => {
+			const response = await request.get("/items/grouped-by-status");
+			expect(response.status).toBe(200);
+			expect(response.body).toBeInstanceOf(Object);
+			expect(Object.keys(response.body).length).toBe(3);
+			console.log(response.body);
+			expect(response.body).toEqual(expect.arrayContaining(
+				[
+					{ totalItems: 2, status: 'Available' },
+					{ totalItems: 1, status: 'Loaned' },
+					{ totalItems: 1, status: 'Reserved' }
+				]
+			));
+		});
+
+		it("should retrieve all items", async () => {
+			const response = await request.get("/items");
+			expect(response.status).toBe(200);
+			expect(response.body).toBeInstanceOf(Array);
+			expect(response.body.map(item => ({
+				name: item.name,
+				description: item.description,
+				category: item.category,
+				status: item.status,
+				stock: item.stock,
+			}))).toEqual(expect.arrayContaining(expectedItems));
+		});
+
+		it("retrieve a single item", async () => {
+			const allItems = await request.get("/items");
+			const item = allItems.body[0];
+			const id = item._id;
+			const itemCategory = item.category;
+
+			const response = await request.get("/item/" + id);
+			expect(response.status).toBe(200);
+			const categoryID = response.body.category;
+			delete response.body.category; // do not check category field!
+			delete item.category; // do not check category field!
+			// do not check category field!
+			expect(response.body).toMatchObject(item);
+			const category = await request.get("/category/" + categoryID);
+			expect(category.body.name).toMatchObject(itemCategory);
+		});
+
+		it ("create a new item", async () => {
+			const categories = await request.get("/categories");
+			const category = categories.body[0];
+			const newCategory = category._id;
+			const newItem = {
+				name: "Test Item",
+				description: "This is a test item",
+				status: "Available",
+				stock: 100,
+				price: 100,
+				category: newCategory
+			};
+			const response = await request.post("/item/create").send(newItem);
+			expect(response.status).toBe(200);
+			expect(response.text).toBe("success");
+			// get all items and check if the new item is added
+		});
+
+		it("create a new item with invalid name", async () => {
+			const categories = await request.get("/categories");
+			const category = categories.body[0];
+			const newCategory = category._id;
+			const newItem = {
+				name: "T",
+				description: "This is a test item",
+				status: "Available",
+				stock: 100,
+				price: 100,
+				category: newCategory
+			};
+			const response = await request.post("/item/create").send(newItem);
+			console.log(response.body);
+			expect(response.status).toBe(400); // get 500 instead
+			// expect(response.body).toContain("Name must have at least 3 characters.");
+		});
+ 
+		it("create a new item with invalid category", async () => {
+			const newItem = {
+				name: "Test Item",
+				description: "This is a test item",
+				status: "Available",
+				stock: 100,
+				price: 100,
+				category: "5f9b1b1b4f3b9b1b4f3b9b1b"
+			};
+			const response = await request.post("/item/create").send(newItem);
+			// expect(response.status).toBe(400);
+			console.log(response.text);
+		});
+
+		it("create a new item with image", async () => {
+			const categories = await request.get("/categories");
+			const category = categories.body[0];
+			const newCategory = category._id;
+			const newItem = {
+				name: "Test Item",
+				description: "This is a test item",
+				status: "Available",
+				stock: 100,
+				price: 100,
+				category: newCategory,
+				image: {
+					url: "https://example.com/image.jpg",
+					alt: "Image description"
+				}
+			};
+			const response = await request.post("/item/create").send(newItem);
+			expect(response.status).toBe(200);
+			expect(response.text).toBe("success");
+		});
+
+		it("delete an item", async () => {
+			const allItems = await request.get("/items");
+			const item = allItems.body[0];
+			const id = item._id;
+			const response = await request.post("/item/" + id + "/delete").send({ password: "1234" });
+			expect(response.status).toBe(200);
+			expect(response.text).toBe("success");
+		});
+
+		it("delete an item without password", async () => {
+			const allItems = await request.get("/items");
+			const item = allItems.body[0];
+			const id = item._id;
+			const response = await request.post("/item/" + id + "/delete");
+			expect(response.status).toBe(403);
+			// expect(response.text).toBe("Permission denied");
+		});
+
+		// FAULT
+		it("delete an item with invalid id", async () => {
+			const response = await request.post("/item/123/delete").send({ password: "1234" });
+			expect(response.status).toBe(500);
+		}); 
+
+		it("delete an item with non-existing id", async () => {
+			const response = await request.post("/item/5f9b1b1b4f3b9b1b4f3b9b1b/delete").send({ password: "1234" });
+			// expect(response.status).toBe(404);
+		});
+
+		it("delete an item that has been already deleted", async () => {
+			const allItems = await request.get("/items");
+			const item = allItems.body[0];
+			const id = item._id;
+			await Item.findByIdAndRemove(id);
+			const deleteAgainResponse = await request.post("/item/" + id + "/delete").send({ password: "1234" });
+			// expect(deleteAgainResponse.status).toBe(404);
+		});
+
+		it("update an item", async () => {
+			const allItems = await request.get("/items");
+			const item = allItems.body[0];
+			const id = item._id;
+			const updatedItem = {
+				_id: id,
+				name: "Updated Item",
+				description: "This is an updated item",
+				status: "Available",
+				stock: 100,
+				price: 100,
+				category: item.category
+			};
+			const response = await request.post("/item/" + id + "/update").send(updatedItem);
+			expect(response.status).toBe(200);
+			expect(response.text).toBe("success");
+		});
+
+		// FAULT
+		it("update an item with null object", async () => {
+			const allItems = await request.get("/items");
+			const item = allItems.body[0];
+			const id = item._id;
+			const updatedItem = null;
+			const response = await request.post("/item/" + id + "/update").send(updatedItem);
+			expect(response.status).toBe(500);
+			// expect(response.body).toContain("Name must have at least 3 characters.");
+		});
+
+	});
