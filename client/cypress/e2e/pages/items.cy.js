@@ -65,38 +65,95 @@ describe("Items Page Tests", () => {
     cy.contains("All items");
   });
 
-  it("The stock will be automatically round down to 100", () => {
-    // Mock the create item POST request
-    cy.intercept("POST", "**/item/create", { statusCode: 200 }).as(
-      "createItem"
+  it("can edit an item", () => {
+    // Mock the fetch item request if any and update request
+    cy.intercept("POST", "**/item/**/update", { statusCode: 200 }).as(
+      "updateItem"
     );
-    cy.visit("/edit/item?title=Create+new+item");
-    cy.contains("label", "Name").next().children("input").type("Test");
-    cy.contains("label", "Description")
-      .next()
-      .children("input")
-      .type("This is a test description.");
 
-    cy.contains("label", "Price").next().children("input").type("10");
-
-    // Continue filling out the rest of the form
-    cy.contains("label", "Stock").next().children("input").type("200");
-    cy.contains("label", "Category")
-      .next()
-      .children("select")
-      .select("Electronics");
-    cy.contains("label", "Status")
-      .next()
-      .children("select")
-      .select("Available");
-
+    cy.contains("Hammer").click();
+    cy.contains("9.99").should("be.visible"); // Ensure the page or component has loaded and displays the price $9.99
+    cy.get(".tabler-icon-edit").click();
+    cy.url().should("include", "/edit");
+    cy.contains("label", "Price").next().children("input").clear().type("10");
     cy.contains("button", "Submit").click();
-    cy.wait("@createItem").then((interception) => {
-      cy.visit("http://localhost:3000/items");
-      cy.contains("Test").click();
-      // it should display the correct stock
-      cy.contains("200");
-      expect(interception.request.body).to.have.property("stock", 200);
+
+    // Wait for the POST request to complete
+    cy.wait("@updateItem").its("request.body").should("include", {
+      name: "Hammer",
+      description: "A sturdy hammer for household repairs",
+      price: "10",
+      stock: 25,
+      status: "Available",
     });
+  });
+
+  it("can send a delete request with the password entered", () => {
+    cy.intercept("POST", "**/item/**/delete", (req) => {
+      if (req.body.password === "adminPassword") {
+        return req.reply({
+          statusCode: 200,
+          ok: true,
+        });
+      } else {
+        return req.reply({
+          statusCode: 403,
+          ok: false,
+        });
+      }
+    }).as("deleteRequest");
+
+    cy.contains("Hammer").click();
+    cy.contains("9.99").should("be.visible"); // Ensure the page or component has loaded and displays the price $9.99
+
+    // Stub the prompt to return the correct password
+    cy.window().then((win) => {
+      cy.stub(win, "prompt").returns("adminPassword");
+    });
+
+    // Trigger the delete operation
+    cy.get('[data-testid="delete-button"]').click();
+
+    // Wait for the API call to complete
+    cy.wait("@deleteRequest").its("response.statusCode").should("eq", 200);
+
+    // Verify redirection to the items page
+    cy.url().should("include", "/items");
+  });
+
+  it("fails to delete an item with incorrect password", () => {
+    cy.intercept("POST", "**/item/**/delete", (req) => {
+      if (req.body.password === "adminPassword") {
+        return req.reply({
+          statusCode: 200,
+          ok: true,
+        });
+      } else {
+        return req.reply({
+          statusCode: 403,
+          ok: false,
+        });
+      }
+    }).as("deleteRequest");
+
+    cy.contains("Hammer").click();
+    cy.contains("9.99").should("be.visible"); // Ensure the page or component has loaded and displays the price $9.99
+
+    // Stub the prompt to return an incorrect password
+    cy.window().then((win) => {
+      cy.stub(win, "prompt").returns("wrongPassword");
+    });
+
+    // Trigger the delete operation
+    cy.get('[data-testid="delete-button"]').click();
+
+    // Wait for the API call to complete
+    cy.wait("@deleteRequest").its("response.statusCode").should("eq", 403);
+
+    // Check that an error message is displayed
+    cy.contains("Forbidden").should("be.visible");
+
+    // Check that we are still on the same page
+    cy.url().should("not.include", "/items");
   });
 });
