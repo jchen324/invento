@@ -26,8 +26,6 @@ describe("Home Page Update After Edit", () => {
     cy.wait(["@getItemsByCategory", "@getRecentItems"]);
 
     // Verify the Home page reflects the updated data
-    // For example, check that the count for a category has increased/decreased
-    // or that the 'Latest items' list includes the newly edited item
     cy.get("p.mantine-Text-root").contains("Yoga Ball").should("exist");
   });
 

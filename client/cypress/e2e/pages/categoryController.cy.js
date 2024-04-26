@@ -17,7 +17,6 @@ describe("Categories Page Tests", () => {
     cy.wait("@getCategories");
 
     // Add an assertion to check for the visibility of all expected categories
-    // Update the '.category-name' selector to match your HTML
     const expectedCategories = [
       "Books",
       "Clothing",
@@ -38,9 +37,7 @@ describe("Categories Page Tests", () => {
     // Mock the update category request
     cy.intercept("POST", "**/category/**/update", {
       statusCode: 200,
-      body: {
-        /* Your mock response body if needed */
-      },
+      body: {},
     }).as("updateCategory");
 
     // Visit the Categories page and click the 'Edit' button for "Books"
@@ -48,7 +45,6 @@ describe("Categories Page Tests", () => {
     cy.contains("tr", "Books").find("button").contains("Edit").click();
 
     // Ensure the edit page has loaded and input fields are visible
-    // Replace the below selectors with the actual selectors from your app
     cy.url().should("include", "/edit");
     cy.get('input[placeholder="Science"]').should("be.visible");
 
@@ -63,8 +59,6 @@ describe("Categories Page Tests", () => {
       name: "Book",
     });
 
-    // Optionally verify that the UI updates to reflect the change
-    // This depends on whether your app optimistically updates the UI
     cy.contains("tr", "Book").should("exist");
   });
   it("should be able to delete a category and verify the deletion without actual deletion", () => {

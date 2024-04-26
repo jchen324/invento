@@ -3,9 +3,7 @@ describe("Item Creation Page Category Dropdown", () => {
     // Intercept the GET request for categories
     cy.intercept("POST", "**/category/**/update", {
       statusCode: 200,
-      body: {
-        /* Your mock response body if needed */
-      },
+      body: {},
     }).as("updateCategory");
 
     // Visit the Categories page and click the 'Edit' button for "Books"
@@ -57,9 +55,8 @@ describe("Item Creation Page Category Dropdown", () => {
       statusCode: 200,
     }).as("deleteCategory");
 
-    // Navigate to the category deletion interface in your app
     cy.visit("http://localhost:3000/categories");
-    // Replace the below with the actual actions to delete a category
+
     cy.contains("tr", "Tools").within(() => {
       cy.window().then((win) => {
         cy.stub(win, "prompt").returns("1234");
