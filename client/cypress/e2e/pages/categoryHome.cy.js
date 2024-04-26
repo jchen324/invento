@@ -38,7 +38,7 @@ describe("Home Page Update After Edit", () => {
 
     // Perform the delete operation (clicking the delete button and confirming)
     cy.visit("http://localhost:3000/items");
-    cy.intercept("DELETE", "/item/**", {
+    cy.intercept("POST", "**/item/**/delete", {
       statusCode: 200,
       body: {},
     }).as("deleteItem");

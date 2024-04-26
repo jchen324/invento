@@ -1,0 +1,48 @@
+{
+  "total": 2,
+  "totalPassed": 2,
+  "totalFailed": 0,
+  "totalSuites": 2,
+  "suites": [
+    {
+      "name": "HorizontalBarChart.cy.tsx",
+      "path": "cypress/components/charts/HorizontalBarChart.cy.tsx",
+      "tests": [
+        {
+          "status": "pass",
+          "name": "HorizontalBarChart.cy.tsx-bar-chart",
+          "percentage": 0.041303752856126766,
+          "failureThreshold": 0.2,
+          "specPath": "cypress/components/charts/HorizontalBarChart.cy.tsx",
+          "specFilename": "HorizontalBarChart.cy.tsx",
+          "baselinePath": "cypress-image-diff-screenshots/baseline/HorizontalBarChart.cy.tsx-bar-chart.png",
+          "diffPath": "",
+          "comparisonPath": "cypress-image-diff-screenshots/comparison/HorizontalBarChart.cy.tsx-bar-chart.png"
+        }
+      ]
+    },
+    {
+      "name": "PiChart.cy.tsx",
+      "path": "cypress/components/charts/PiChart.cy.tsx",
+      "tests": [
+        {
+          "status": "pass",
+          "name": "PiChart.cy.tsx-pi-chart",
+          "percentage": 0,
+          "failureThreshold": 0.2,
+          "specPath": "cypress/components/charts/PiChart.cy.tsx",
+          "specFilename": "PiChart.cy.tsx",
+          "baselinePath": "cypress-image-diff-screenshots/baseline/PiChart.cy.tsx-pi-chart.png",
+          "diffPath": "",
+          "comparisonPath": "cypress-image-diff-screenshots/comparison/PiChart.cy.tsx-pi-chart.png"
+        }
+      ]
+    }
+  ],
+  "startedAt": "2024-04-26T16:26:17.316Z",
+  "endedAt": "2024-04-26T16:26:27.883Z",
+  "duration": 2688,
+  "browserName": "electron",
+  "browserVersion": "118.0.5993.159",
+  "cypressVersion": "13.8.0"
+}
