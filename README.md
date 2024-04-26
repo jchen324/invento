@@ -1,10 +1,12 @@
-# invento 📦
+# CS422 Software Testing & Debugging Final Project - invento 📦
 
-A basic inventory management app built with MERN stack.
+**Team members: Jiarui Chen, Taiming Shi, Nora Xu**
+
+Testing on a basic inventory management app built with MERN stack.
 
 ![Screenshot of website](screenshots/homepage.png)
 
-## Features
+## App Features
 - Jamstack architecture
 - Sorting and filtering capabilities for categories
 - CRUD operations on items and categories
@@ -53,3 +55,59 @@ To install dependencies for frontend:
 cd client
 npm install
 ```
+
+## How to Run The Tests
+
+### Backend Tests
+TODO
+
+### Frontend Tests
+Go to server folder 
+```bash
+cd server
+```
+Run the server with frontend test database
+```bash
+npm run dev:test
+```
+
+Start a second terminal and go to client folder
+```bash
+cd client
+```
+
+Run the client server
+```bash
+npm run dev
+```
+
+Start a third terminal and go to client folder
+```bash
+cd client
+```
+
+Run the Cypress component and e2e tests on command line
+```bash
+npm run test
+```
+
+Alternatively, run the Cypress component and e2e tests on Cypress UI
+```bash
+npm run cypress:open
+```
+
+## How to Run The Program Without Testing
+
+### Backend
+```bash
+cd server
+npm run dev
+```
+
+### Frontend
+```bash
+cd client
+npm run dev
+```
+
+Use [http://localhost:3000](http://localhost:3000) to access the app.
