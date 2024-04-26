@@ -19,28 +19,16 @@ describe("PieChart Component Tests", () => {
   it("renders the pie chart with the correct title", () => {
     // Checking if the PieChart renders with the provided title
     cy.document().then((doc) => {
-      console.log(doc.body.innerHTML); // Use the browser's console to inspect the elements
       cy.get("canvas").should("be.visible");
+
+      cy.wait(1000); // Wait for 1 second for the pi chart to fully load
+
+      // Use visual testing to test the content of the pi chart by
+      // checking if the pi chart generated is the same as the baseline
+      cy.compareSnapshot({
+        name: "pi-chart",
+        testThreshold: 0.2,
+      });
     });
-
-    // Use contains to find the title by its text content
-    // cy.contains(titleName).should('be.visible');
   });
-
-  //   it('renders the pie chart with all slices', () => {
-  //     // Checking if the pie chart has rendered the correct number of slices
-  //     cy.get('.pie-slice').should('have.length', labelsArray.length);
-  //   });
-
-  //   it('displays tooltip on hover', () => {
-  //     // Hover over the first slice and check if the tooltip appears
-  //     cy.get('.pie-slice').first().trigger('mouseover');
-  //     cy.get('.tooltip').should('contain', labelsArray[0])
-  //                       .and('be.visible');
-  //   });
-
-  //   it('selects a slice on click', () => {
-  //     // Click on a slice and verify if it is selected (assuming some class like 'selected' is added)
-  //     cy.get('.pie-slice').eq(1).click();
-  //    });
 });
