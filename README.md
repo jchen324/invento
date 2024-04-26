@@ -59,13 +59,25 @@ npm install
 ## How to Run The Tests
 
 ### Backend Tests
-TODO
+Go to server folder 
+```bash
+cd server
+```
+
+Run the test via Vitest UI with coverage report
+```bash
+npx vitest --coverage --ui
+```
+
+You will then be directed to a web UI where all the backend tests will be run. The coverage report can also be viewed on this web UI.
+<img width="1707" alt="Screenshot 2024-04-26 at 3 49 58 PM" src="https://github.com/jchen324/invento/assets/77957751/7d019df9-01d2-4c0d-ad4d-7040219e447b">
 
 ### Frontend Tests
 Go to server folder 
 ```bash
 cd server
 ```
+
 Run the server with frontend test database
 ```bash
 npm run dev:test
