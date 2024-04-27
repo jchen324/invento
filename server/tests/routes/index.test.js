@@ -99,7 +99,7 @@ describe("Category Routes", () => {
 
   /*
 	* FAILURE 1: returns status 500 instead of 400 when provided with random invalid id
-	* This is because category_detail() function does not have a try catch block to catch the error thrown by mongoose
+	* The fault is category_detail() function does not have a try catch block to catch the error thrown by mongoose
 	* when the id is invalid, and the function terminates by throwing 500 server error instead of redirecting to the /categories endpoint.
 	*/
   it("retrieve a single category with invalid id", async () => {
@@ -109,7 +109,7 @@ describe("Category Routes", () => {
 
   /*
 	* FAILURE 2: does not return null in the body of the response when provided with non-existing mongoose id
-	* This is because the category_detail function does not return after redirecting to the /categories endpoint,
+	* The fault is the category_detail function does not return after redirecting to the /categories endpoint,
 	* causing the code to fall through and returning an empty object which shouldn't happen.
 	*/
   it("retrieve a single category with non-existing mongoose id", async () => {
@@ -145,7 +145,7 @@ describe("Category Routes", () => {
   /*
 	* FAILURE 3: when creating a new category that does not fulfill the minimum character requirement,
 	* we are unable to access the error response message.
-	* This is because the category_create_post function is incorrectly sending error messages through res.writeHead() 
+	* The fault is the category_create_post function is incorrectly sending error messages through res.writeHead() 
 	*/
   it("create a new category with invalid data", async () => {
     const newCategory = {
@@ -159,7 +159,7 @@ describe("Category Routes", () => {
 
   /*
 	* FAILURE 4: when creating a new category with an existing name, we get 500 instead of 403 status code
-	* This is because the category_create_post function forgets to await the Category.find() function.
+	* The fault is the category_create_post function forgets to await the Category.find() function.
 	* Later on mongoose throws duplicate key error, which causes 500 server error to be thrown.
 	*/
   it("create a new category with existing name", async () => {
@@ -189,7 +189,7 @@ describe("Category Routes", () => {
 
   /*
 	* FAILURE 5: when updating a category with invalid data, we do not get 400 status code, and 200 success instead
-	* This is because the category_update_post function does not check for the minimum character requirement for name and description
+	* The fault is the category_update_post function does not check for the minimum character requirement for name and description
 	* This is inconsistent with the requirements that it has in the category_create_post function
 	*/
   it("update a category with invalid data", async () => {
@@ -209,7 +209,7 @@ describe("Category Routes", () => {
 
   /*
 	* FAILURE 6: when updating a category with non-existing id, we do not get 404 status code, and 200 success instead
-	* This is because the category_update_post function does not check if the category exists before attempting to update it
+	* The fault is the category_update_post function does not check if the category exists before attempting to update it
 	*/
   it("update a category with non-existing id", async () => {
     const updatedCategory = {
@@ -219,7 +219,7 @@ describe("Category Routes", () => {
     const response = await request
       .post("/category/5f9b1b1b4f3b9b1b4f3b9b1b/update")
       .send(updatedCategory);
-    expect(response.status).toBe(404); // still returns 200
+    expect(response.status).toBe(404); 
   });
 
   it("update a category with invalid id", async () => {
@@ -235,7 +235,7 @@ describe("Category Routes", () => {
 
   /*
 	* FAILURE 7: when deleting a category without password, we are unable to get the correct error message
-	* This is because the category_delete_post function is incorrectly sending error messages through res.writeHead()
+	* The fault is the category_delete_post function is incorrectly sending error messages through res.writeHead()
 	*/
   it("delete a category without password", async () => {
     const allCategories = await request.get("/categories");
@@ -248,7 +248,7 @@ describe("Category Routes", () => {
 
   /*
 	* FAILURE 8: when deleting a category with correct password that is used by existing item, we do not get the correct error message
-	* This is because the category_delete_post function is incorrectly sending error messages through res.writeHead()
+	* The fault is the category_delete_post function is incorrectly sending error messages through res.writeHead()
 	*/
   it("delete category with correct password that is used by existing item", async () => {
     const allCategories = await request.get("/categories");
@@ -277,7 +277,7 @@ describe("Category Routes", () => {
 
   /*
 	* FAILURE 9: when deleting a category with an invalid random id, we do not get 400 status code, and 500 instead
-	* This is because the category_delete_post function does not have a try catch block to catch the error thrown by mongoose
+	* The fault is the category_delete_post function does not have a try catch block to catch the error thrown by mongoose
 	* when the id is invalid, and the function terminates by throwing 500 server error.
 	*/
   it("delete category with invalid id", async () => {
@@ -440,7 +440,7 @@ describe("Item Routes", () => {
 
 	/*
 	* FAILURE 10: when creating a new item with invalid name, we do not get the correct error message
-	* This is because the item_create_post function is incorrectly sending error messages through res.writeHead()
+	* The fault is the item_create_post function is incorrectly sending error messages through res.writeHead()
 	*/
   it("create a new item with invalid name", async () => {
     const categories = await request.get("/categories");
@@ -461,7 +461,7 @@ describe("Item Routes", () => {
 
 	/*
 	* FAILURE 11: when creating a new item with invalid category, we get 500 instead of 400 status code
-	* This is because the item_create_post function does not await for the Category.findById() function to complete
+	* The fault is the item_create_post function does not await for the Category.findById() function to complete
 	* and mongoose later on throws an error which is uncaught and causes 500 server error to be thrown.
 	*/
   it("create a new item with invalid category", async () => {
@@ -511,7 +511,7 @@ describe("Item Routes", () => {
 
 	/*
 	* FAILURE 12: when deleting an item without password, we do not get the correct error message
-	* This is because the item_delete_post function is incorrectly sending error messages through res.writeHead()
+	* The fault is the item_delete_post function is incorrectly sending error messages through res.writeHead()
 	*/
   it("delete an item without password", async () => {
     const allItems = await request.get("/items");
@@ -524,7 +524,7 @@ describe("Item Routes", () => {
 
   /*
 	* FAILURE 13: when deleting an item with correct password that is used by existing item, we get an uncaught error
-	* This is because the item_delete_post function does not check for valid IDs before attempting to delete the item
+	* The fault is the item_delete_post function does not check for valid IDs before attempting to delete the item
 	*/
   it("delete an item with invalid id", async () => {
     const response = await request
@@ -535,7 +535,7 @@ describe("Item Routes", () => {
 
 	/*
 	* FAILURE 14: when deleting an item with non-existing id, we do not get 404 status code, and 500 instead
-	* This is because the item_delete_post function does not await for the Item.findById() function to complete beore attempting to delete the item
+	* The fault is the item_delete_post function does not await for the Item.findById() function to complete beore attempting to delete the item
 	*/
   it("delete an item with non-existing id", async () => {
     const response = await request
@@ -546,7 +546,7 @@ describe("Item Routes", () => {
 
 	/*
 	* FAILURE 15: when deleting an item that has been already deleted, we do not get 404 status code, and 200 success instead
-	* This is caused again by the item_delete_post function not checking for valid IDs before attempting to delete the item
+	* The fault is the item_delete_post function not checking for valid IDs before attempting to delete the item
 	* The mongoose function Item.findByIdAndRemove() returns null when the item does not exist, and dosn't throw error either
 	* Resulting in us getting a 200 success status code instead of 404
 	*/
@@ -583,7 +583,7 @@ describe("Item Routes", () => {
 
   /*
 	* FAILURE 16: when updating an item with null object, we do not get a meaningful error message
-	* This is because the item_update_post function is incorrectly sending error messages through res.writeHead()
+	* The fault is the item_update_post function is incorrectly sending error messages through res.writeHead()
 	*/
   it("update an item with null object", async () => {
     const allItems = await request.get("/items");
